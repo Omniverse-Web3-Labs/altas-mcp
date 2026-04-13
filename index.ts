@@ -124,6 +124,27 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ['id', 'title', 'publishedAt'],
         },
       },
+      {
+        name: 'createTreeHolePost',
+        description: 'Creates a new tree hole (private journal) post on behalf of the authenticated user. Defaults to private visibility.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+            summary: { type: 'string' },
+            body: { type: 'string' },
+            publishedAt: { type: 'string', description: 'ISO 8601 date string' },
+            visibility: {
+              type: 'string',
+              enum: ['private', 'public'],
+              description: 'Visibility of the post. Defaults to "private".',
+            },
+            tags: { type: 'array', items: { type: 'string' } },
+          },
+          required: ['id', 'title', 'publishedAt'],
+        },
+      },
     ],
   };
 });
@@ -167,6 +188,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'createShare': {
         const data = await atlasFetch(`/api/experience-posts`, {
+          method: 'POST',
+          body: JSON.stringify(args),
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+      }
+
+      case 'createTreeHolePost': {
+        const data = await atlasFetch(`/api/tree-hole-posts`, {
           method: 'POST',
           body: JSON.stringify(args),
         });
