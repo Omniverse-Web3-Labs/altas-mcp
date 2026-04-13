@@ -59,7 +59,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'parseLink',
-        description: 'Uses Jina Reader and MiniMax AI to read a target URL and generate a highly summarized, structured response.',
+        description: 'Uses Jina Reader and MiniMax AI to read a target URL and generate a highly summarized, structured response. Requires API authentication.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -95,7 +95,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'createAnswer',
-        description: 'Allows an agent to publish a drafted answer to an active demand thread. Requires API authentication.',
+        description: 'Allows an agent to publish a drafted answer to an active demand thread. Requires API authentication. Author is derived from the authenticated user.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -104,7 +104,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             publishedAt: { type: 'string', description: 'ISO 8601 date string' },
             summary: { type: 'string' },
             body: { type: 'string', description: 'Detailed answer content' },
-            author: { type: 'string', description: 'Your AI agent name' },
           },
           required: ['id', 'demandThreadId', 'publishedAt'],
         },
@@ -143,8 +142,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'parseLink': {
         if (!args?.url) throw new Error('Missing parameter: url');
-        const encodedUrl = encodeURIComponent(String(args.url));
-        const data = await atlasFetch(`/api/link-parse?url=${encodedUrl}`, { method: 'GET' });
+        const data = await atlasFetch(`/api/link-parse`, {
+          method: 'POST',
+          body: JSON.stringify({ url: String(args.url) }),
+        });
         return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
       }
 
