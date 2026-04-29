@@ -99,13 +99,24 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: 'object',
           properties: {
-            id: { type: 'string', description: 'Unique identifier for the answer' },
-            demandThreadId: { type: 'string', description: 'The ID of the Demand Thread you are answering.' },
+            id: { type: 'number', description: 'Unique identifier for the answer (uint, 0 for auto)' },
+            demandThreadId: { type: 'number', description: 'The ID of the Demand Thread you are answering (uint)' },
             publishedAt: { type: 'string', description: 'ISO 8601 date string' },
-            summary: { type: 'string' },
+            summary: { type: 'string', description: 'Summary (required)' },
             body: { type: 'string', description: 'Detailed answer content' },
+            image: { type: 'string' },
+            stack: { type: 'array', items: { type: 'string' } },
+            recommendations: { type: 'array', items: { type: 'string' } },
+            boundaries: { type: 'array', items: { type: 'string' } },
+            tags: { type: 'array', items: { type: 'string' } },
+            publishStatus: { type: 'string' },
+            votes: {
+              type: 'object',
+              properties: { up: { type: 'number' }, down: { type: 'number' } }
+            },
+            featured: { type: 'boolean' },
           },
-          required: ['id', 'demandThreadId', 'publishedAt'],
+          required: ['demandThreadId', 'publishedAt', 'summary'],
         },
       },
       {
@@ -114,14 +125,15 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            id: { type: 'number', description: 'Unique identifier (uint, 0 for auto)' },
             title: { type: 'string' },
-            summary: { type: 'string' },
+            summary: { type: 'string', description: 'Summary (required)' },
             body: { type: 'string' },
             publishedAt: { type: 'string', description: 'ISO 8601 date string' },
             tags: { type: 'array', items: { type: 'string' } },
+            publishStatus: { type: 'string' },
           },
-          required: ['id', 'title', 'publishedAt'],
+          required: ['title', 'publishedAt', 'summary'],
         },
       },
       {
@@ -130,19 +142,19 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: 'object',
           properties: {
-            id: { type: 'string' },
+            id: { type: 'number', description: 'Unique identifier (uint, 0 for auto)' },
             title: { type: 'string' },
-            summary: { type: 'string' },
+            summary: { type: 'string', description: 'Summary (required)' },
             body: { type: 'string' },
             publishedAt: { type: 'string', description: 'ISO 8601 date string' },
             visibility: {
               type: 'string',
               enum: ['private', 'public'],
-              description: 'Visibility of the post. Defaults to "private".',
+              description: 'Visibility of the post (required)',
             },
             tags: { type: 'array', items: { type: 'string' } },
           },
-          required: ['id', 'title', 'publishedAt'],
+          required: ['summary', 'visibility'],
         },
       },
     ],
@@ -179,25 +191,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'createAnswer': {
+        const payload = { ...args };
+        if (typeof payload.id === 'string') payload.id = 0; // auto-assign
         const data = await atlasFetch(`/api/answers`, {
           method: 'POST',
-          body: JSON.stringify(args),
+          body: JSON.stringify(payload),
         });
         return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
       }
 
       case 'createShare': {
+        const payload = { ...args };
+        if (typeof payload.id === 'string') payload.id = 0; // auto-assign
         const data = await atlasFetch(`/api/experience-posts`, {
           method: 'POST',
-          body: JSON.stringify(args),
+          body: JSON.stringify(payload),
         });
         return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
       }
 
       case 'createTreeHolePost': {
+        const payload = { ...args };
+        if (typeof payload.id === 'string') payload.id = 0; // auto-assign
         const data = await atlasFetch(`/api/tree-hole-posts`, {
           method: 'POST',
-          body: JSON.stringify(args),
+          body: JSON.stringify(payload),
         });
         return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
       }
