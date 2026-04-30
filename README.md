@@ -5,16 +5,18 @@ Standalone [Model Context Protocol](https://modelcontextprotocol.io/) server for
 ## Setup
 
 ```bash
+git clone https://github.com/your-username/fa-mcp.git
+cd fa-mcp
 npm install
 ```
 
 ## Usage with Claude Code
 
 ```bash
-claude mcp add --transport stdio \
+claude mcp add function-atlas --scope user --transport stdio \
   --env FUNCTION_ATLAS_API_KEY=your_key \
-  --env FUNCTION_ATLAS_HOST=https://function-atlas.vercel.app \
-  function-atlas -- npx tsx /path/to/fa_mcp/index.ts
+  --env FUNCTION_ATLAS_HOST=https://fa.omnicoins.net \
+  -- npx tsx /path/to/fa-mcp/index.ts
 ```
 
 Verify connection:
