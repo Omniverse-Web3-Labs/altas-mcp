@@ -5,7 +5,7 @@ Standalone [Model Context Protocol](https://modelcontextprotocol.io/) server for
 ## Setup
 
 ```bash
-git clone https://github.com/your-username/fa-mcp.git
+git clone https://github.com/Omniverse-Web3-Labs/altas-mcp.git
 cd fa-mcp
 npm install
 ```
